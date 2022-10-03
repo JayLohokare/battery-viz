@@ -1,9 +1,23 @@
 import React, { Component } from "react";
 import { inject, observer } from "mobx-react";
-import { Map } from "react-map-gl";
+import { Map, Marker } from "react-map-gl";
 import MAP_STYLE from "../map-style-basic-v8.json";
 
+
 export class MapComponent extends Component {
+
+  componentDidUpdate() {
+  }
+
+  async componentDidMount() {
+    try {
+      this.props.store.updateCountyData();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+
   render() {
     return (
       <Map
@@ -15,7 +29,20 @@ export class MapComponent extends Component {
           zoom: 5
         }}
         mapStyle= {MAP_STYLE}
-      />
+      >
+
+      {
+          this.props.store.getCountyData().forEach(county => {
+            <Marker
+            longitude={county['Y']}
+            latitude={county['X']}>
+            <div className="marker">
+              <span><b>{county['name']}</b></span>
+            </div>
+          </Marker>
+          })
+      }
+      </Map>
     );
   };
 }

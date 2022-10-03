@@ -23,7 +23,7 @@ class App extends Component {
         <div style={dataStyle}></div>
 
         <div style={mapStyle}>
-        <MapComponent/>
+        <MapComponent store={this.props.store}/>
         </div>
       </div>
     );
