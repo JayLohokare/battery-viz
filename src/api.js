@@ -7,16 +7,13 @@ class APIService {
       };
 
       const response = await Promise.race([
-        fetch('https://jaylohokare-battery-api-976g4pw5p9rfx7qr-5000.githubpreview.dev/getCounties', {
-          method: "GET",
+        fetch('https://jaylohokare-battery-viz-g4xvwg6rjv7fwrpg-5000.githubpreview.dev/getCounties', {
+          method: "POST",
           headers: {
             "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods" : 'HEAD, GET, POST, PUT, PATCH, DELETE',
-            "Access-Control-Allow-Headers" : 'Origin, Content-Type, X-Auth-Token',
-            Accept: "application/json",
             "Content-Type": "application/json",
           },
-        //   body: JSON.stringify(requstBody),
+          body: JSON.stringify(requstBody),
         }),
         new Promise((_, reject) =>
           setTimeout(() => reject(new Error("timeout")), 20000)
@@ -26,8 +23,15 @@ class APIService {
       const responseJson = await response.json();
       return responseJson;
     } catch (error) {
+
       console.log("Unable to fetch counties");
       console.log(error);
+      
+      // var data = JSON.parse('./dummyData/counties.json');
+      let data = require('./dummyData/counties.json');
+      console.log("dummy data")
+      console.log(data)
+      return data
     }
     return null;
   }

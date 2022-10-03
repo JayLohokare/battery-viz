@@ -1,6 +1,6 @@
 import MAP_STYLE from "../map-style-basic-v8.json";
 import WebMercatorViewport from "viewport-mercator-project";
-import { observable, computed, action, makeObservable } from "mobx";
+import { observable, computed, action, makeObservable , runInAction} from "mobx";
 
 import { apiService } from "../api.js";
 export default class DataStore {
@@ -28,7 +28,10 @@ initiateMap(){
 
 async updateCountyData(){
     const dynamicAssets = await apiService.getCountyData();
-    this.countyData = dynamicAssets;
+    runInAction(() => {
+        this.countyData = dynamicAssets;
+        
+    })
 }
 
 getCountyData(){
