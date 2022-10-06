@@ -41,9 +41,9 @@ def getData():
     if county not in df["County"].tolist():
         return {}
 
-    print(df.columns)
+    df = df.loc[df['County'] == county]
+    df = df.iloc[:, 11:] 
 
-    df.loc[df['County'] == county]
     response = jsonify(df.to_dict('records'))
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
