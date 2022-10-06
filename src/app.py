@@ -29,11 +29,24 @@ def getCounties():
 @app.route('/getData',  methods=['POST', 'GET'])
 @cross_origin()
 def getData():
-    df = pandas.read_csv('data/supply.csv', header=[0,1], encoding = 'ISO-8859-1').dropna()
-   
+    county = request.args.get('county')
+    if county == None:
+        return {}
+    
+    df = pandas.read_csv('data/supply.csv', encoding = 'ISO-8859-1')
+    df.columns = ( df.columns[:12].tolist()  + df.iloc[0, 12:].tolist()   )
+    df = df.iloc[1:].reset_index(drop=True) 
+    df =  df.iloc[: , :176]
+
+    if county not in df["County"].tolist():
+        return {}
+
     print(df.columns)
-  
-    return "None"
+
+    df.loc[df['County'] == county]
+    response = jsonify(df.to_dict('records'))
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 
 if __name__=="__main__":
