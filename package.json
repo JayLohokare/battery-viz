@@ -9,10 +9,12 @@
     "mapbox-gl": "^2.10.0",
     "mobx": "^6.6.2",
     "mobx-react": "^7.5.3",
+    "pondjs": "^0.9.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-map-gl": "^7.0.19",
     "react-scripts": "5.0.1",
+    "react-timeseries-charts": "^0.16.1",
     "viewport-mercator-project": "^7.0.4",
     "web-vitals": "^2.1.4"
   },
