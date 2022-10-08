@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/battery-viz/static/css/main.092125b7.css",
+    "main.js": "/battery-viz/static/js/main.b5fb36c7.js",
+    "static/js/483.b463d16f.chunk.js": "/battery-viz/static/js/483.b463d16f.chunk.js",
+    "static/media/marker.png": "/battery-viz/static/media/marker.6e58a22e37571f6d99e0.png",
+    "index.html": "/battery-viz/index.html",
+    "main.092125b7.css.map": "/battery-viz/static/css/main.092125b7.css.map",
+    "main.b5fb36c7.js.map": "/battery-viz/static/js/main.b5fb36c7.js.map",
+    "483.b463d16f.chunk.js.map": "/battery-viz/static/js/483.b463d16f.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.092125b7.css",
+    "static/js/main.b5fb36c7.js"
+  ]
+}
