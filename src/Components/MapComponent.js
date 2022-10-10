@@ -4,6 +4,9 @@ import { Map, Marker, Popup} from "react-map-gl";
 import MAP_STYLE from "../map-style-basic-v8.json";
 import pinImg from "./marker.png";
 import 'mapbox-gl/dist/mapbox-gl.css'; 
+import Loader from "react-js-loader";
+import Chart from "react-apexcharts";
+import Popupcontent from "./PopupContent.js"
 
 const markerStyle = {
   height: '10px',
@@ -11,14 +14,26 @@ const markerStyle = {
 }
 
 
-export class MapComponent extends Component {
+const popupStyle = {
+  height: '35%',
+  width: '50%',
+}
 
-  componentDidUpdate() {
-  }
+const chartStyle = {
+  height: '100%',
+  width: '100%',
+}
+
+const chartContainerStyle = {
+  position: 'relative',
+  overflow: 'scroll',
+}
+
+export class MapComponent extends Component {
 
   async componentDidMount() {
     try {
-      this.props.store.updateCountyData();
+      this.props.store.updateCounties();
     } catch (error) {
       console.log(error);
     }
@@ -47,18 +62,41 @@ export class MapComponent extends Component {
     this.setState({popupOpen:popupOpenDct })
   }
 
-  _renderMarker(county){
-      console.log(county);
-      console.log(county['X'], county['Y']);
+  handleMarkerClick(countyName){
+    this.setPopupOpen(countyName, true)
+    this.getCountyData(countyName)
+  }
+
+  getCountyData(countyName) {
+    this.props.store.updateCountyData(countyName)
+  }
 
 
+  _renderPopUpContent(county){
+    this.props.store.setCountyDataLoading(county['name'], false);
+    
+    if (county['name'] in this.props.store.getCountyData() && !this.props.store.getCountyDataLoading(county['name'])) {
+      console.log("Found valid county data");
       return(
-        <div>
+        <Popupcontent county={county['name']}/>
+      );
+    } else {
+      return(
+          <div className={"item"}>
+              <Loader type="spinner-default" bgColor={"#0096FF"} color={'#0096FF'} size={100} />
+          </div>
+      );
+    }
+  }
+
+  _renderMarker(county){
+      return(
+        <div key={county['name']}>
           <Marker 
-          key={county['name']}
+          key={county['name'] + "-marker"}
           latitude={parseFloat(county['X'])}
           longitude={parseFloat(county['Y'])}
-          onClick={() => this.setPopupOpen(county['name'], true)}
+          onClick={() => this.handleMarkerClick(county['name'])}
           >
             <img
               src={pinImg}
@@ -73,12 +111,10 @@ export class MapComponent extends Component {
               longitude={parseFloat(county['Y'])}
               onClose={() => this.setPopupOpen(county['name'], false)}
               closeButton={true}
-              offsetLeft={10}
+              style={popupStyle}
             >
-              <span style={{fontSize: "1vw", fontFamily: "Poppins"}}>
-                {county['name']}
-              </span>
-
+              <div>{this._renderPopUpContent(county)}</div>
+              
             </Popup>
             )}
 
@@ -99,25 +135,12 @@ export class MapComponent extends Component {
         }}
         mapStyle= {MAP_STYLE}
       >
-
-        {/* <Marker 
-          longitude={-100} latitude={40}
-          />
-
-      <Popup longitude={-100} latitude={40}
-        anchor="bottom"
-        // onClose={() => setShowPopup(false)
-        >
-        Render Tiemseries graph here
-      </Popup> */}
-
       <div>
-         {
-          this.props.store.countyData.map((county) => this._renderMarker(county))
+        {
+          this.props.store.counties.map((county) => this._renderMarker(county))
         }
       </div>
-      
-
+    
       </Map>
 
     );

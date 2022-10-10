@@ -1,11 +1,15 @@
 import MAP_STYLE from "../map-style-basic-v8.json";
 import WebMercatorViewport from "viewport-mercator-project";
-import { observable, computed, action, makeObservable , runInAction} from "mobx";
+import { observable, computed, action, makeObservable , runInAction, keys} from "mobx";
 
 import { apiService } from "../api.js";
+import { Index } from "pondjs";
+
 export default class DataStore {
  
-countyData = [];
+counties = [];
+countyData = {};
+countyDataLoading = {};
 
 mapViewPort = {
     width: "fit",
@@ -26,26 +30,52 @@ initiateMap(){
     this.mapViewPort = newViewport;
 }
 
-async updateCountyData(){
-    const dynamicAssets = await apiService.getCountyData();
+async updateCounties(){
+    const dynamicAssets = await apiService.getCounties(true);
     runInAction(() => {
-        this.countyData = dynamicAssets;
-        
+        this.counties = dynamicAssets;
     })
 }
 
-getCountyData(){
-    return this.countyData;
+async updateCountyData(county) {
+    const data = await apiService.getCountyData(county, true);
+
+    runInAction(() => {
+        this.countyData[county] = data;
+    })
+}
+
+getCountyDataLoading(county){
+    return this.countyDataLoading[county]
+}
+
+setCountyDataLoading(county, value){
+    return this.countyDataLoading[county] = value
+}
+
+getCounties(){
+    return this.counties;
+}
+
+getCountyData(county=null){
+    if (county == null) {
+        return this.countyData
+    } 
+    return this.countyData[county];
 }
 
 constructor(value) {
 makeObservable(this, {
     mapViewPort: observable,
-    initiateMap: observable,
+    counties: observable,
     countyData: observable,
     initiateMap: action,
+    getCounties: action,
     getCountyData: action,
+    updateCounties: action,
     updateCountyData: action,
+    getCountyDataLoading: action,
+    setCountyDataLoading: action,
 })
 this.value = value
 }

@@ -42,9 +42,20 @@ def getData():
         return {}
 
     df = df.loc[df['County'] == county]
-    df = df.iloc[:, 11:] 
+    df = df.iloc[:, 12:] 
+    respArray = []
 
-    response = jsonify(df.to_dict('records'))
+    for index, row in df.iterrows():
+        print(index)
+        dfRow = row.dropna()
+        dfDict = dfRow.to_dict()
+        print(dfDict)
+        respVal = {}
+        respVal['index'] = list(dfDict.keys())
+        respVal['values'] = list(dfDict.values())
+        respArray.append(respVal)
+
+    response = jsonify(respArray)
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
