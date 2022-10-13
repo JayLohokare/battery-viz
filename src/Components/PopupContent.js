@@ -2,7 +2,8 @@ import React, { Component } from "react";
 import { inject, observer } from "mobx-react";
 import 'mapbox-gl/dist/mapbox-gl.css'; 
 import Chart from "react-apexcharts";
-
+import { apiService } from "../api.js";
+import Loader from "react-js-loader";
 
 const options = {
 	chart: {
@@ -29,11 +30,6 @@ const chartStyle = {
 
 
 export class Popupcontent extends Component {
-
-	componentDidMount(){
-		console.log("Loaded")
-		this.props.store.setCountyDataLoading(this.props.county, true)
-   	}
 
 	_getSeries(data){
 		var  series = [
@@ -64,26 +60,42 @@ export class Popupcontent extends Component {
 		return options;
 	}
 
+	constructor(props) {
+		super(props);
+		this.state = {
+			data: null,
+		};
+	}
+	
+	async componentDidMount() {
+		var loader = <Loader type="spinner-default" bgColor={"#0096FF"} color={'#0096FF'} size={100} />
+		this.setState({ data: loader });
 
-	render() {
-		return (
-		<div>{this.props.store.getCountyData(this.props.county).map((data, index) => 
-			
-				// this._renderChart(location, index)
-				// <p>Whatsup</p>
-				<Chart
+		var promise = new Promise(function(resolve, reject) {
+			// call resolve if the method succeeds
+		resolve(true);
+		})
+
+
+		const assets = apiService.getCountyData(this.props.county, true);
+
+		console.log(assets);
+		var graphs = assets.map((data, index) => 
+			<Chart
 				key={this.props.county + "-" + index + "-capacity-chart"}
 				options={this._getOptions(data)}
 				series={this._getSeries(data)}
 				width="200"
 				height="100"
 				type="bar"
-				style={chartStyle}
-				
-					
-				/>
-			
-			)}</div>
+				style={chartStyle}/>
+		)
+		this.setState({ data: graphs });
+	}
+
+	render() { 
+		return (
+		<div>{this.state.data}</div>
 		);
 	};
 }

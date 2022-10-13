@@ -40,7 +40,6 @@ export class MapComponent extends Component {
   }
 
   setSelectedMarker(markerId){
-    
   }
 
   closePopup = () => {
@@ -63,8 +62,8 @@ export class MapComponent extends Component {
   }
 
   handleMarkerClick(countyName){
-    this.setPopupOpen(countyName, true)
-    this.getCountyData(countyName)
+    this.setPopupOpen(countyName, true);
+    // this.getCountyData(countyName);
   }
 
   getCountyData(countyName) {
@@ -73,20 +72,13 @@ export class MapComponent extends Component {
 
 
   _renderPopUpContent(county){
-    this.props.store.setCountyDataLoading(county['name'], false);
-    
-    if (county['name'] in this.props.store.getCountyData() && !this.props.store.getCountyDataLoading(county['name'])) {
-      console.log("Found valid county data");
-      return(
-        <Popupcontent county={county['name']}/>
-      );
-    } else {
-      return(
-          <div className={"item"}>
-              <Loader type="spinner-default" bgColor={"#0096FF"} color={'#0096FF'} size={100} />
-          </div>
-      );
-    }
+    return(
+     
+      <div className={"item"}>
+          <Popupcontent county={county['name']}/>
+      </div>
+     
+    );
   }
 
   _renderMarker(county){

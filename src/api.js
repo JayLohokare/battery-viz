@@ -1,6 +1,5 @@
 class APIService {
  async getCounties(dummy=false) {
-    console.log("Fetchin counties");
 
     if (dummy) {
       let data = require('./dummyData/counties.json');
