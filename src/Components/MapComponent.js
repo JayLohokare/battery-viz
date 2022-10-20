@@ -31,7 +31,7 @@ const chartContainerStyle = {
 
 export class MapComponent extends Component {
 
-  async componentDidMount() {
+  componentDidMount() {
     try {
       this.props.store.updateCounties();
     } catch (error) {
@@ -39,12 +39,15 @@ export class MapComponent extends Component {
     }
   }
 
-  setSelectedMarker(markerId){
+  componentDidUpdate(){
+    console.log(this.state.popupOpen)
+    
   }
+  
 
-  closePopup = () => {
-    this.setSelectedMarker(null)
-  };
+  closePopup(county) {
+    this.setPopupOpen(county['name'], false);
+  }
 
   
   constructor(props) {
@@ -63,54 +66,57 @@ export class MapComponent extends Component {
 
   handleMarkerClick(countyName){
     this.setPopupOpen(countyName, true);
-    // this.getCountyData(countyName);
   }
-
-  getCountyData(countyName) {
-    this.props.store.updateCountyData(countyName)
-  }
-
 
   _renderPopUpContent(county){
     return(
-     
       <div className={"item"}>
-          <Popupcontent county={county['name']}/>
+          <Popupcontent county={county["name"]}/>
       </div>
-     
     );
   }
 
   _renderMarker(county){
+
       return(
         <div key={county['name']}>
-          <Marker 
-          key={county['name'] + "-marker"}
-          latitude={parseFloat(county['X'])}
-          longitude={parseFloat(county['Y'])}
-          onClick={() => this.handleMarkerClick(county['name'])}
-          >
-            <img
-              src={pinImg}
-              style={markerStyle}
-            />
-          </Marker>
-
-          {this.state.popupOpen[county['name']] && (
-            <Popup
-              key={county['name']}
+        {this.props.loading === true ? 
+            <Loader type="spinner-default" bgColor={"#0096FF"} color={'#0096FF'} size={100} />
+            :
+            <div >
+              <Marker 
+              key={county['name'] + "-marker"}
               latitude={parseFloat(county['X'])}
               longitude={parseFloat(county['Y'])}
-              onClose={() => this.setPopupOpen(county['name'], false)}
-              closeButton={true}
-              style={popupStyle}
-            >
-              <div>{this._renderPopUpContent(county)}</div>
-              
-            </Popup>
-            )}
-
-        </div>
+              onClick={() => this.handleMarkerClick(county['name'])}
+              >
+                <img
+                  src={pinImg}
+                  style={markerStyle}
+                />
+              </Marker>
+              {this.state.popupOpen[county['name']] === true ? (
+                <Popup
+                  key={county['name']}
+                  latitude={parseFloat(county['X'])}
+                  longitude={parseFloat(county['Y'])}
+                  onClose={() => 
+                    {
+                      this.setPopupOpen(county['name'], false);
+                    }
+                  }
+                  closeButton={true}
+                  style={popupStyle}
+                >
+                  <div>{this._renderPopUpContent(county)}</div>
+                </Popup>
+                )
+                :
+                <div/>
+              }
+            </div>  
+			}
+      </div>
       );
   }
 

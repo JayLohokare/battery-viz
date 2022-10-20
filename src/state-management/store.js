@@ -10,6 +10,9 @@ export default class DataStore {
 counties = [];
 countyData = {};
 countyDataLoading = {};
+isDataReady = {};
+loading = true;
+popupOpen = {};
 
 mapViewPort = {
     width: "fit",
@@ -30,18 +33,59 @@ initiateMap(){
     this.mapViewPort = newViewport;
 }
 
+setPopup(county, state){
+    this.popupOpen[county] = state;
+}
+
+getPopup(county){
+    if (county in this.popupOpen) {
+        return this.popupOpen[county];
+    } 
+    return false;
+}
+
 async updateCounties(){
-    const dynamicAssets = await apiService.getCounties(true);
     runInAction(() => {
-        this.counties = dynamicAssets;
+        this.loading = true;
+    })
+
+    let countyList = await apiService.getCounties(true);
+
+    countyList.map((county) => 
+    {
+        if (county["name"] in this.countyData === false){
+            runInAction(() => {
+                this.countyData[county["name"]] = [];
+            })
+        }
+        
+        if (county["name"] in this.isDataReady === false){
+            runInAction(() => {
+                this.isDataReady[county["name"]] = false;
+            })
+        }
+    })
+
+    runInAction(() => {
+        this.counties = countyList;
+        this.loading = false;
     })
 }
 
-async updateCountyData(county) {
-    const data = await apiService.getCountyData(county, true);
-
+async updateCountyData(county, data) {
+    if (data == null) {
+        var newData = await apiService.getCountyData(county, true);
+        data = newData
+    }
+   
     runInAction(() => {
-        this.countyData[county] = data;
+        var isDataReady = this.isDataReady;
+        isDataReady[county] = true
+        this.isDataReady = isDataReady;
+
+        var countyDataNew = this.countyData
+        countyDataNew[county] = data;
+        this.countyData = countyDataNew;
     })
 }
 
@@ -68,6 +112,8 @@ constructor(value) {
 makeObservable(this, {
     mapViewPort: observable,
     counties: observable,
+    loading: observable,
+    isDataReady: observable,
     countyData: observable,
     initiateMap: action,
     getCounties: action,
@@ -76,6 +122,8 @@ makeObservable(this, {
     updateCountyData: action,
     getCountyDataLoading: action,
     setCountyDataLoading: action,
+    setPopup: action,
+    getPopup: action,
 })
 this.value = value
 }

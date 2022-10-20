@@ -45,7 +45,6 @@ class APIService {
 
 
 async getCountyData(county, dummy=false) {
-  console.log("Fetchin county data for ", county);
 
   if (dummy) {
     let data = require('./dummyData/timeseries.json');

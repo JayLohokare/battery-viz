@@ -4,6 +4,10 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import Chart from "react-apexcharts";
 import { apiService } from "../api.js";
 import Loader from "react-js-loader";
+import { makeAutoObservable, reaction } from "mobx"
+import { toJS } from 'mobx'
+
+import GraphContainer from "./GraphContainer.js"
 
 const options = {
 	chart: {
@@ -22,80 +26,47 @@ const  series = [
 ];
 
 
-const chartStyle = {
-	height: '100%',
-	width: '100%',
-  }
-
 
 
 export class Popupcontent extends Component {
 
-	_getSeries(data){
-		var  series = [
-			{
-				name: "capacity",
-				data: data['values'],
-				dataLabels: {
-					enabled: false
-				},
-			}
-			];
-
-		return series;
-	}
-
-	_getOptions(data){
-		var options = {
-			dataLabels: {
-				enabled: false
-			},
-			chart: {
-			  id: "basic-bar"
-			},
-			xaxis: {
-			  categories: data['index']
-			}
-		  }
-		return options;
-	}
 
 	constructor(props) {
 		super(props);
 		this.state = {
-			data: null,
+			isDataReady: false,
 		};
 	}
 	
-	async componentDidMount() {
-		var loader = <Loader type="spinner-default" bgColor={"#0096FF"} color={'#0096FF'} size={100} />
-		this.setState({ data: loader });
 
-		var promise = new Promise(function(resolve, reject) {
-			// call resolve if the method succeeds
-		resolve(true);
-		})
+	componentDidMount (){    
 
+		this.props.store.updateCountyData(this.props.county);
+		// (async () => {
+		// 	await this.props.store.updateCountyData(this.props.county)
+		// })();
+		
+		// console.log(this.state.graphData);
+		// var data = apiService.getCountyData(toJS(this.props.county), true);
 
-		const assets = apiService.getCountyData(this.props.county, true);
-
-		console.log(assets);
-		var graphs = assets.map((data, index) => 
-			<Chart
-				key={this.props.county + "-" + index + "-capacity-chart"}
-				options={this._getOptions(data)}
-				series={this._getSeries(data)}
-				width="200"
-				height="100"
-				type="bar"
-				style={chartStyle}/>
-		)
-		this.setState({ data: graphs });
-	}
+		// data.then((value) => {
+		// 	this.props.store.updateCountyData(this.props.county, value);
+		// 	this.setState({isDataReady: true});
+		// 	console.log(this.state.isDataReady);
+		// 	console.log(this.props.store.countyData[this.props.county])
+		// });
+    }
 
 	render() { 
+		console.log(this.props.store.isDataReady[this.props.county])
 		return (
-		<div>{this.state.data}</div>
+		<div>
+			{this.props.store.isDataReady[this.props.county] === false || typeof this.props.store.isDataReady[this.props.county] == 'undefined' ? 
+                <Loader type="spinner-default" bgColor={"#0096FF"} color={'#0096FF'} size={100} />
+            :
+                <GraphContainer id="container" county={this.props.county}/>
+			}
+		</div>
 		);
 	};
 }
